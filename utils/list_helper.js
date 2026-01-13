@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const dummy = () => {
   return 1
 }
@@ -12,45 +14,69 @@ const favoriteBlog = (blogs) => {
   return blogs.reduce((prev, curr) => (prev.likes >= curr.likes ? prev : curr))
 }
 
+// const mostBlogs = (blogs) => {
+//   if (blogs.length === 0) return null
+
+//   const authorCounts = blogs.reduce((counts, blog) => {
+//     counts[blog.author] = (counts[blog.author] || 0) + 1
+//     return counts
+//   }, {})
+
+//   const topAuthor = Object.keys(authorCounts).reduce((a, b) =>
+//     authorCounts[a] > authorCounts[b] ? a : b
+//   )
+
+//   return {
+//     author: topAuthor,
+//     blogs: authorCounts[topAuthor]
+//   }
+// }
+
 const mostBlogs = (blogs) => {
   if (blogs.length === 0) return null
 
-  const authorCounts = blogs.reduce((counts, blog) => {
-    counts[blog.author] = (counts[blog.author] || 0) + 1
-    return counts
-  }, {})
+  const counts = _.countBy(blogs, 'author')
 
-  const topAuthor = Object.keys(authorCounts).reduce((a, b) =>
-    authorCounts[a] > authorCounts[b] ? a : b
-  )
+  const countArray = _.map(counts, (val, key) => ({
+    author: key,
+    blogs: val,
+  }))
 
-  return {
-    author: topAuthor,
-    blogs: authorCounts[topAuthor]
-  }
+  return _.maxBy(countArray, 'blogs')
 }
 
 const mostLikes = (blogs) => {
   if (blogs.length === 0) return null
 
-  // 1. Accumulate total likes per author
-  const authorLikes = blogs.reduce((likesMap, blog) => {
-    likesMap[blog.author] = (likesMap[blog.author] || 0) + blog.likes
-    return likesMap
-  }, {})
-
-  // 2. Find the author with the highest total likes
-  const topAuthor = Object.keys(authorLikes).reduce((a, b) =>
-    authorLikes[a] > authorLikes[b] ? a : b
-  )
-
-  console.log(`${topAuthor}`)
-
-  return {
-    author: topAuthor,
-    likes: authorLikes[topAuthor]
-  }
+  return _.chain(blogs)
+    .groupBy('author')
+    .map((authorBlogs, authorName) => ({
+      author: authorName,
+      likes: _.sumBy(authorBlogs, 'likes')
+    }))
+    .maxBy('likes')
+    .value()
 }
+
+// const mostLikes = (blogs) => {
+//   if (blogs.length === 0) return null
+
+//   // 1. Accumulate total likes per author
+//   const authorLikes = blogs.reduce((likesMap, blog) => {
+//     likesMap[blog.author] = (likesMap[blog.author] || 0) + blog.likes
+//     return likesMap
+//   }, {})
+
+//   // 2. Find the author with the highest total likes
+//   const topAuthor = Object.keys(authorLikes).reduce((a, b) =>
+//     authorLikes[a] > authorLikes[b] ? a : b
+//   )
+
+//   return {
+//     author: topAuthor,
+//     likes: authorLikes[topAuthor]
+//   }
+// }
 
 module.exports = {
   dummy,
