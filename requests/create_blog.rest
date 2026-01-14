@@ -1,9 +1,0 @@
-POST http://localhost:3001/api/blogs
-Content-Type: application/json
-
-{
-  "title": "Tesing Blog With Rest",
-  "author": "Testing Author With Rest",
-  "url": "Testing URI With Rest",
-  "likes": 10
-}
